@@ -1,6 +1,7 @@
 from typing import NamedTuple, Any
 import cfpq_data
-
+import networkx as nx
+from networkx.drawing.nx_pydot import write_dot
 
 
 class GraphInfo(NamedTuple):
@@ -20,4 +21,13 @@ def get_graph_info(graph_name: str) -> GraphInfo:
     return GraphInfo(nodes_cnt, edges_cnt, labels)
 
 
+def save_two_cycles_graph(
+        n: int, m: int,
+        labels: tuple[str, str],
+        output_path: str,
+        common_node: int | Any = 0
+) -> nx.MultiDiGraph:
+    graph = cfpq_data.labeled_two_cycles_graph(n, m, common_node=common_node, labels=labels)
 
+    write_dot(graph, output_path)
+    return graph
