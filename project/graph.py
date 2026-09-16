@@ -1,7 +1,6 @@
 from typing import NamedTuple, Any
 import cfpq_data
 import networkx as nx
-from networkx.drawing.nx_pydot import write_dot
 
 
 class GraphInfo(NamedTuple):
