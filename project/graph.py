@@ -22,12 +22,15 @@ def get_graph_info(graph_name: str) -> GraphInfo:
 
 
 def save_two_cycles_graph(
-        n: int, m: int,
-        labels: tuple[str, str],
-        output_path: str,
-        common_node: int | Any = 0
+    n: int,
+    m: int,
+    labels: tuple[str, str],
+    output_path: str,
+    common_node: int | Any = 0,
 ) -> nx.MultiDiGraph:
-    graph = cfpq_data.labeled_two_cycles_graph(n, m, common_node=common_node, labels=labels)
+    graph = cfpq_data.labeled_two_cycles_graph(
+        n, m, common_node=common_node, labels=labels
+    )
 
     write_dot(graph, output_path)
     return graph
