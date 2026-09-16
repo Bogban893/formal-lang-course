@@ -32,5 +32,6 @@ def save_two_cycles_graph(
         n, m, common_node=common_node, labels=labels
     )
 
-    write_dot(graph, output_path)
+    pydot_graph = nx.drawing.nx_pydot.to_pydot(graph)
+    pydot_graph.write_raw(output_path)
     return graph
