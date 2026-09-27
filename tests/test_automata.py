@@ -5,7 +5,7 @@ from pyformlang.finite_automaton import (
     NondeterministicFiniteAutomaton,
 )
 
-from project.task_2 import regex_to_dfa, graph_to_nfa
+from project.automata import regex_to_dfa, graph_to_nfa
 
 
 class TestRegexToDfa:
