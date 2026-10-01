@@ -9,7 +9,6 @@ from project.automata import graph_to_nfa, regex_to_dfa
 
 
 class AdjacencyMatrixFA:
-
     def __init__(self, automaton: NondeterministicFiniteAutomaton | None = None):
         self.matrices: dict[Symbol, csr_matrix] = {}
         self.index_to_state: dict[int, State] = {}
