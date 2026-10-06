@@ -6,7 +6,7 @@ from project.rpq import AdjacencyMatrixFA
 
 
 def ms_bfs_based_rpq(
-        regex: str, graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int]
+    regex: str, graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int]
 ) -> set[tuple[int, int]]:
     graph_fa = AdjacencyMatrixFA(graph_to_nfa(graph, start_nodes, final_nodes))
     regex_fa = AdjacencyMatrixFA(regex_to_dfa(regex))
