@@ -1,5 +1,5 @@
 import networkx as nx
-from pyformlang.cfg import CFG, Variable, Terminal, Production, Epsilon
+from pyformlang.cfg import CFG, Variable, Terminal, Production
 
 
 def cfg_to_weak_normal_form(cfg: CFG) -> CFG:
@@ -51,18 +51,17 @@ def cfg_to_weak_normal_form(cfg: CFG) -> CFG:
 
 
 def hellings_based_cfpq(
-        cfg: CFG,
-        graph: nx.DiGraph,
-        start_nodes: set[int] = None,
-        final_nodes: set[int] = None,
+    cfg: CFG,
+    graph: nx.DiGraph,
+    start_nodes: set[int] = None,
+    final_nodes: set[int] = None,
 ) -> set[tuple[int, int]]:
     my_cfg = cfg_to_weak_normal_form(cfg)
     reach = set()
     for start, end, data in graph.edges(data=True):
         terminal = Terminal(data["label"])
         for production in my_cfg.productions:
-            if (len(production.body) == 1
-                    and production.body[0] == terminal):
+            if len(production.body) == 1 and production.body[0] == terminal:
                 triple = (production.head, start, end)
                 reach.add(triple)
 
@@ -83,12 +82,7 @@ def hellings_based_cfpq(
 
             for var1, u, k in reach:
                 for var2, k2, v in reach:
-
-                    if (
-                            var1 == first
-                            and var2 == second
-                            and k == k2
-                    ):
+                    if var1 == first and var2 == second and k == k2:
                         new_reach.add((head, u, v))
 
         if new_reach.issubset(reach):
@@ -97,5 +91,11 @@ def hellings_based_cfpq(
         reach.update(new_reach)
 
     return set(
-        (u, v) for var, u, v in reach if (var == my_cfg.start_symbol and (start_nodes is None or u in start_nodes)
-                                          and (final_nodes is None or v in final_nodes)))
+        (u, v)
+        for var, u, v in reach
+        if (
+            var == my_cfg.start_symbol
+            and (start_nodes is None or u in start_nodes)
+            and (final_nodes is None or v in final_nodes)
+        )
+    )
