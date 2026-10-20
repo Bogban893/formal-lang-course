@@ -6,18 +6,17 @@ from project.hellings import cfg_to_weak_normal_form, hellings_based_cfpq
 
 
 class TestWeakNormalForm:
-    @pytest.mark.parametrize("grammar", [
-        "S -> a",
-        "S -> epsilon",
-        "S -> A B\n"
-        "A -> a\n"
-        "B -> b",
-        "S -> a S b | epsilon",
-        "S -> A\n"
-        "A -> B\n"
-        "B -> a",
-        "S -> a b c d",
-    ])
+    @pytest.mark.parametrize(
+        "grammar",
+        [
+            "S -> a",
+            "S -> epsilon",
+            "S -> A B\nA -> a\nB -> b",
+            "S -> a S b | epsilon",
+            "S -> A\nA -> B\nB -> a",
+            "S -> a b c d",
+        ],
+    )
     def test_result_is_weak_normal_form(self, grammar):
         cfg = CFG.from_text(grammar)
 
@@ -29,29 +28,23 @@ class TestWeakNormalForm:
             assert (
                 len(body) == 0
                 or (len(body) == 1 and isinstance(body[0], Terminal))
-                or (
-                    len(body) == 2
-                    and all(isinstance(x, Variable) for x in body)
-                )
+                or (len(body) == 2 and all(isinstance(x, Variable) for x in body))
             )
 
-    @pytest.mark.parametrize("grammar, words", [
-        ("S -> a", [[], ["a"], ["b"]]),
-        ("S -> epsilon", [[], ["a"]]),
-        ("S -> a b", [["a", "b"], ["a"], ["b", "a"]]),
-        (
-            "S -> a S b | epsilon",
-            [[], ["a", "b"], ["a", "a", "b", "b"], ["a", "b", "b"]]
-        ),
-        (
-            "S -> A\nA -> B\nB -> a",
-            [[], ["a"], ["b"]]
-        ),
-        (
-            "S -> a b c d",
-            [["a", "b", "c", "d"], ["a", "b"], []]
-        ),
-    ])
+    @pytest.mark.parametrize(
+        "grammar, words",
+        [
+            ("S -> a", [[], ["a"], ["b"]]),
+            ("S -> epsilon", [[], ["a"]]),
+            ("S -> a b", [["a", "b"], ["a"], ["b", "a"]]),
+            (
+                "S -> a S b | epsilon",
+                [[], ["a", "b"], ["a", "a", "b", "b"], ["a", "b", "b"]],
+            ),
+            ("S -> A\nA -> B\nB -> a", [[], ["a"], ["b"]]),
+            ("S -> a b c d", [["a", "b", "c", "d"], ["a", "b"], []]),
+        ],
+    )
     def test_language_is_preserved(self, grammar, words):
         cfg = CFG.from_text(grammar)
 
@@ -82,8 +75,7 @@ class TestWeakNormalForm:
 
         for production in result.productions:
             assert not (
-                len(production.body) == 1
-                and isinstance(production.body[0], Variable)
+                len(production.body) == 1 and isinstance(production.body[0], Variable)
             )
 
     def test_original_grammar_is_not_modified(self):
@@ -128,14 +120,11 @@ class TestHellings:
     )
     def test_vertex_filters(self, start_nodes, final_nodes, expected):
         graph = nx.DiGraph()
-        for start, end, label in [(0, 1, "a"), (1, 2, "b"),
-                                  (2, 3, "a"), (3, 4, "b")]:
+        for start, end, label in [(0, 1, "a"), (1, 2, "b"), (2, 3, "a"), (3, 4, "b")]:
             graph.add_edge(start, end, label=label)
         cfg = CFG.from_text("S -> a b")
 
-        assert hellings_based_cfpq(
-            cfg, graph, start_nodes, final_nodes
-        ) == expected
+        assert hellings_based_cfpq(cfg, graph, start_nodes, final_nodes) == expected
 
     def test_epsilon_on_isolated_vertices(self):
         graph = nx.DiGraph()
@@ -152,7 +141,12 @@ class TestHellings:
         cfg = CFG.from_text("S -> a | S S")
 
         assert hellings_based_cfpq(cfg, graph) == {
-            (0, 1), (1, 2), (2, 3), (0, 2), (1, 3), (0, 3)
+            (0, 1),
+            (1, 2),
+            (2, 3),
+            (0, 2),
+            (1, 3),
+            (0, 3),
         }
 
     def test_parallel_edges(self):
