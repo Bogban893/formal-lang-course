@@ -1,3 +1,5 @@
+from collections import defaultdict, deque
+
 import networkx as nx
 from pyformlang.cfg import CFG, Variable, Terminal, Production
 
@@ -57,38 +59,53 @@ def hellings_based_cfpq(
     final_nodes: set[int] = None,
 ) -> set[tuple[int, int]]:
     my_cfg = cfg_to_weak_normal_form(cfg)
-    reach = set()
-    for start, end, data in graph.edges(data=True):
-        terminal = Terminal(data["label"])
-        for production in my_cfg.productions:
-            if len(production.body) == 1 and production.body[0] == terminal:
-                triple = (production.head, start, end)
-                reach.add(triple)
+    terminal_rules = defaultdict(set)
+    left_rules = defaultdict(set)
+    right_rules = defaultdict(set)
+    nullable = set()
 
     for production in my_cfg.productions:
-        if len(production.body) == 0:
-            for node in graph.nodes:
-                reach.add((production.head, node, node))
+        body = production.body
+        if not body:
+            nullable.add(production.head)
+        elif len(body) == 1:
+            terminal_rules[body[0]].add(production.head)
+        else:
+            first, second = body
+            left_rules[first].add((production.head, second))
+            right_rules[second].add((production.head, first))
 
-    while True:
-        new_reach = set()
+    reach = set()
+    queue = deque()
+    outgoing = defaultdict(set)
+    incoming = defaultdict(set)
 
-        for production in my_cfg.productions:
-            if len(production.body) != 2:
-                continue
+    def add_path(var, start, end):
+        triple = (var, start, end)
+        if triple not in reach:
+            reach.add(triple)
+            outgoing[var, start].add(end)
+            incoming[var, end].add(start)
+            queue.append(triple)
 
-            head = production.head
-            first, second = production.body
+    for start, end, data in graph.edges(data=True):
+        terminal = Terminal(data["label"])
+        for var in terminal_rules[terminal]:
+            add_path(var, start, end)
 
-            for var1, u, k in reach:
-                for var2, k2, v in reach:
-                    if var1 == first and var2 == second and k == k2:
-                        new_reach.add((head, u, v))
+    for var in nullable:
+        for node in graph.nodes:
+            add_path(var, node, node)
 
-        if new_reach.issubset(reach):
-            break
+    while queue:
+        var, start, end = queue.popleft()
+        for head, second in left_rules[var]:
+            for final in tuple(outgoing[second, end]):
+                add_path(head, start, final)
 
-        reach.update(new_reach)
+        for head, first in right_rules[var]:
+            for initial in tuple(incoming[first, start]):
+                add_path(head, initial, end)
 
     return set(
         (u, v)
