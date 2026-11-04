@@ -9,9 +9,7 @@ from scipy.sparse import csr_matrix, identity, kron, lil_matrix
 
 def cfg_to_rsm(cfg: CFG) -> RecursiveAutomaton:
     start_symbol = cfg.start_symbol if cfg.start_symbol is not None else Variable("S")
-    automata = {
-        variable: EpsilonNFA() for variable in cfg.variables | {start_symbol}
-    }
+    automata = {variable: EpsilonNFA() for variable in cfg.variables | {start_symbol}}
     for automaton in automata.values():
         automaton.add_start_state(State("start"))
 
