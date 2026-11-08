@@ -32,7 +32,9 @@ class TestGll:
             graph.add_edge(start, end, label=label)
         cfg = CFG.from_text("S -> a b")
 
-        assert gll_based_cfpq(cfg_to_rsm(cfg), graph, start_nodes, final_nodes) == expected
+        assert (
+            gll_based_cfpq(cfg_to_rsm(cfg), graph, start_nodes, final_nodes) == expected
+        )
 
     def test_epsilon_on_isolated_vertices(self):
         graph = nx.DiGraph()
