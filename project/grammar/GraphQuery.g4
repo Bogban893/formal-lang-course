@@ -18,9 +18,17 @@ set_expr : '[' expr (',' expr)* ']';
 
 edge_expr : '(' expr ',' expr ',' expr ')';
 
-regexp : CHAR | VAR | '(' regexp ')' | regexp '^' range | regexp '.' regexp | regexp '&' regexp | regexp '|' regexp;
+regexp
+    : CHAR                  # CharRegexp
+    | VAR                   # VarRegexp
+    | '(' regexp ')'        # ParenthesizedRegexp
+    | regexp '^' repeatRange      # RepeatRegexp
+    | regexp '.' regexp     # ConcatRegexp
+    | regexp '&' regexp     # IntersectRegexp
+    | regexp '|' regexp     # UnionRegexp
+    ;
 
-range : '[' NUM '..' NUM? ']';
+repeatRange : '[' NUM '..' NUM? ']';
 
 select : v_filter? v_filter? 'return' VAR (',' VAR)? 'where' VAR 'reachable' 'from' VAR 'in' VAR 'by' expr;
 
