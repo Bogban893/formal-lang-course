@@ -29,25 +29,31 @@ def program_to_tree(program: str) -> tuple[ParserRuleContext, bool]:
     return tree, not errors.has_errors
 
 
-class NodeCountListener(GraphQueryListener):
+class TreeInfoListener(GraphQueryListener):
     def __init__(self):
         self.count = 0
+        self.parts = []
 
     def enterEveryRule(self, ctx):
         self.count += 1
 
-    def visitTerminal(self, node):
+    def visitTerminal(self, node: ParserRuleContext):
         self.count += 1
+
+        if node.getText() != "<EOF>":
+            self.parts.append(node)
 
     def visitErrorNode(self, node):
         self.count += 1
 
 
 def nodes_count(tree: ParserRuleContext) -> int:
-    listener = NodeCountListener()
+    listener = TreeInfoListener()
     ParseTreeWalker().walk(listener, tree)
     return listener.count
 
 
 def tree_to_program(tree: ParserRuleContext) -> str:
-    return tree.getText()
+    listener = TreeInfoListener()
+    ParseTreeWalker().walk(listener, tree)
+    return "".join(listener.parts)
