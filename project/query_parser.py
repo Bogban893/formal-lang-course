@@ -3,6 +3,8 @@ from project.generated.GraphQueryLexer import GraphQueryLexer
 from project.generated.GraphQueryListener import GraphQueryListener
 from project.generated.GraphQueryParser import GraphQueryParser
 from antlr4.error.ErrorListener import ErrorListener
+from antlr4 import Token
+from antlr4.tree.Tree import TerminalNode
 
 
 class SyntaxErrorListener(ErrorListener):
@@ -37,11 +39,11 @@ class TreeInfoListener(GraphQueryListener):
     def enterEveryRule(self, ctx):
         self.count += 1
 
-    def visitTerminal(self, node: ParserRuleContext):
+    def visitTerminal(self, node: TerminalNode):
         self.count += 1
 
-        if node.getText() != "<EOF>":
-            self.parts.append(node)
+        if node.getSymbol().type != Token.EOF:
+            self.parts.append(node.getText())
 
     def visitErrorNode(self, node):
         self.count += 1
@@ -56,4 +58,4 @@ def nodes_count(tree: ParserRuleContext) -> int:
 def tree_to_program(tree: ParserRuleContext) -> str:
     listener = TreeInfoListener()
     ParseTreeWalker().walk(listener, tree)
-    return "".join(listener.parts)
+    return " ".join(listener.parts)
