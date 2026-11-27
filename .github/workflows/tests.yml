@@ -24,5 +24,15 @@ jobs:
       - name: Sync dependencies
         run: rye sync
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Generate parser
+        run: |
+          rye run python -c 'import antlerinator, subprocess; subprocess.run(["java", "-jar", str(antlerinator.download(version="4.13.1", lazy=True)), "-Dlanguage=Python3", "-visitor", "-Xexact-output-dir", "-o", "project/generated", "project/grammar/GraphQuery.g4"], check=True)'
+
       - name: Run tests
-        run: python scripts/run_tests.py
+        run: rye run python scripts/run_tests.py

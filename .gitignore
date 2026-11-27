@@ -148,3 +148,6 @@ _minted-presentation/
 
 # MacOS
 .DS_Store
+
+# Generated (ANTLR)
+project/generated/
